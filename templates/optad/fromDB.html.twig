@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {{form(downloadForm)}}
+
+    {% if data is defined %}
+    <table
+        id="table"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true">
+        <thead>
+            <tr>
+                <th data-field="id" data-sortable="true">ID</th>
+                <th data-field="url" data-sortable="true">URL</th>
+                <th data-field="tags" data-sortable="true">Tags</th>
+                <th data-field="date" data-sortable="true">Date</th>
+                <th data-field="estimatedRevenue" data-sortable="true">Est. Revenue</th>
+                <th data-field="adImpression" data-sortable="true">Ad Impression</th>
+                <th data-field="cpm" data-sortable="true">cpm</th>
+                <th data-field="clicks" data-sortable="true">clicks</th>
+                <th data-field="ctr" data-sortable="true">ctr</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr id="tr-id-{{item.id}}" class="tr-class-{{item.id}} ">
+                <td>{{item.id}}</td>
+                <td>{{item.url}}</td>
+                <td>{{item.tags}}</td>
+                <td>{{item.date | date("Y-m-d") }}</td>
+                <td>{{item.estimatedRevenue}}</td>
+                <td>{{item.adImpression}}</td>
+                <td>{{item.cpm}}</td>
+                <td>{{item.clicks}}</td>
+                <td>{{item.ctr}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elseif msg is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ msg }}
+        </div>
+    {% endif %}
+
+
+
+{% endblock body %}

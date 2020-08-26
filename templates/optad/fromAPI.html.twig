@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {{ form_start(form, {"attr": {"novalidate": "novalidate"}}) }}
+
+    <div class="my-custom-class-for-errors">
+        {{ form_errors(form) }}
+    </div>
+    <div class="d-flex justify-content-around align-items-center">
+            {{ form_row(form.currency) }}
+            {{ form_row(form.startDate) }}
+            {{ form_row(form.endDate) }}
+            {{ form_row(form.submit) }}
+    </div>
+    {{ form_end(form) }}
+
+    {% if headers is defined and data is defined %}
+    <table
+        id="table"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true">
+        <thead>
+            <tr>
+            {% for header in headers %}
+                <th data-field="{{header}}" data-sortable="true">{{header}}</th>
+            {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, items in data %}
+            <tr id="tr-id-{{key}}" class="tr-class-{{key}} ">
+                {% for item in items %}
+                <td>{{item}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elseif msg is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ msg }}
+        </div>
+    {% endif %}
+
+
+
+{% endblock body %}
