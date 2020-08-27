@@ -4,6 +4,8 @@ namespace App\Entity\Starwars;
 
 class StarWarsAPI
 {
+    const API_URL = 'https://swapi.dev/api/';
+
     public static function callAPI($method, $url, $data, $headers = false)
     {
         $curl = curl_init();

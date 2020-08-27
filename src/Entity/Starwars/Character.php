@@ -3,6 +3,8 @@
 namespace App\Entity\Starwars;
 
 use App\Repository\Starwars\CharacterRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -13,7 +15,6 @@ class Character
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -72,6 +73,33 @@ class Character
      * @ORM\Column(type="string", length=255)
      */
     private $url;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Film::class, mappedBy="characters")
+     */
+    private $films;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Planet::class, inversedBy="characters")
+     */
+    private $homeworld;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Species::class, inversedBy="people")
+     */
+    private $species;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Starship::class, mappedBy="pilots")
+     */
+    private $starships;
+
+    public function __construct()
+    {
+        $this->films = new ArrayCollection();
+        $this->species = new ArrayCollection();
+        $this->starships = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -206,6 +234,100 @@ class Character
     public function setUrl(string $url): self
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Film[]
+     */
+    public function getFilms(): Collection
+    {
+        return $this->films;
+    }
+
+    public function addFilm(Film $film): self
+    {
+        if (!$this->films->contains($film)) {
+            $this->films[] = $film;
+            $film->addCharacter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFilm(Film $film): self
+    {
+        if ($this->films->contains($film)) {
+            $this->films->removeElement($film);
+            $film->removeCharacter($this);
+        }
+
+        return $this;
+    }
+
+    public function getHomeworld(): ?Planet
+    {
+        return $this->homeworld;
+    }
+
+    public function setHomeworld(?Planet $homeworld): self
+    {
+        $this->homeworld = $homeworld;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Species[]
+     */
+    public function getSpecies(): Collection
+    {
+        return $this->species;
+    }
+
+    public function addSpecies(Species $species): self
+    {
+        if (!$this->species->contains($species)) {
+            $this->species[] = $species;
+        }
+
+        return $this;
+    }
+
+    public function removeSpecies(Species $species): self
+    {
+        if ($this->species->contains($species)) {
+            $this->species->removeElement($species);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Starship[]
+     */
+    public function getStarships(): Collection
+    {
+        return $this->starships;
+    }
+
+    public function addStarship(Starship $starship): self
+    {
+        if (!$this->starships->contains($starship)) {
+            $this->starships[] = $starship;
+            $starship->addPilot($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStarship(Starship $starship): self
+    {
+        if ($this->starships->contains($starship)) {
+            $this->starships->removeElement($starship);
+            $starship->removePilot($this);
+        }
 
         return $this;
     }

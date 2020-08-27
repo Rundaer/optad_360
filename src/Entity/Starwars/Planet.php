@@ -3,6 +3,8 @@
 namespace App\Entity\Starwars;
 
 use App\Repository\Starwars\PlanetRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,7 +14,6 @@ class Planet
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -76,6 +77,23 @@ class Planet
      * @ORM\Column(type="string", length=255)
      */
     private $url;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Film::class, mappedBy="planets")
+     */
+    private $films;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Character::class, mappedBy="homeworld")
+     */
+    private $characters;
+
+
+    public function __construct()
+    {
+        $this->films = new ArrayCollection();
+        $this->characters = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -222,6 +240,65 @@ class Planet
     public function setUrl(string $url): self
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Film[]
+     */
+    public function getFilms(): Collection
+    {
+        return $this->films;
+    }
+
+    public function addFilm(Film $film): self
+    {
+        if (!$this->films->contains($film)) {
+            $this->films[] = $film;
+            $film->addPlanet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFilm(Film $film): self
+    {
+        if ($this->films->contains($film)) {
+            $this->films->removeElement($film);
+            $film->removePlanet($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Character[]
+     */
+    public function getCharacters(): Collection
+    {
+        return $this->characters;
+    }
+
+    public function addCharacter(Character $character): self
+    {
+        if (!$this->characters->contains($character)) {
+            $this->characters[] = $character;
+            $character->setHomeworld($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCharacter(Character $character): self
+    {
+        if ($this->characters->contains($character)) {
+            $this->characters->removeElement($character);
+            // set the owning side to null (unless already changed)
+            if ($character->getHomeworld() === $this) {
+                $character->setHomeworld(null);
+            }
+        }
 
         return $this;
     }

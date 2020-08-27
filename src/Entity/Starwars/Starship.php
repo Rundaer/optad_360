@@ -3,6 +3,8 @@
 namespace App\Entity\Starwars;
 
 use App\Repository\Starwars\StarshipRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,7 +14,6 @@ class Starship
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -96,6 +97,22 @@ class Starship
      * @ORM\Column(type="string", length=255)
      */
     private $url;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Film::class, mappedBy="starships")
+     */
+    private $films;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Character::class, inversedBy="starships")
+     */
+    private $pilots;
+
+    public function __construct()
+    {
+        $this->films = new ArrayCollection();
+        $this->pilots = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -290,6 +307,60 @@ class Starship
     public function setUrl(string $url): self
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Film[]
+     */
+    public function getFilms(): Collection
+    {
+        return $this->films;
+    }
+
+    public function addFilm(Film $film): self
+    {
+        if (!$this->films->contains($film)) {
+            $this->films[] = $film;
+            $film->addStarship($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFilm(Film $film): self
+    {
+        if ($this->films->contains($film)) {
+            $this->films->removeElement($film);
+            $film->removeStarship($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Character[]
+     */
+    public function getPilots(): Collection
+    {
+        return $this->pilots;
+    }
+
+    public function addPilot(Character $pilot): self
+    {
+        if (!$this->pilots->contains($pilot)) {
+            $this->pilots[] = $pilot;
+        }
+
+        return $this;
+    }
+
+    public function removePilot(Character $pilot): self
+    {
+        if ($this->pilots->contains($pilot)) {
+            $this->pilots->removeElement($pilot);
+        }
 
         return $this;
     }

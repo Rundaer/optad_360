@@ -3,6 +3,8 @@
 namespace App\Entity\Starwars;
 
 use App\Repository\Starwars\SpeciesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,7 +14,6 @@ class Species
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -76,6 +77,27 @@ class Species
      * @ORM\Column(type="string", length=255)
      */
     private $url;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Film::class, mappedBy="species")
+     */
+    private $films;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Character::class, mappedBy="species")
+     */
+    private $people;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Planet::class)
+     */
+    private $homeworld;
+
+    public function __construct()
+    {
+        $this->films = new ArrayCollection();
+        $this->people = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -222,6 +244,74 @@ class Species
     public function setUrl(string $url): self
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Film[]
+     */
+    public function getFilms(): Collection
+    {
+        return $this->films;
+    }
+
+    public function addFilm(Film $film): self
+    {
+        if (!$this->films->contains($film)) {
+            $this->films[] = $film;
+            $film->addSpecies($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFilm(Film $film): self
+    {
+        if ($this->films->contains($film)) {
+            $this->films->removeElement($film);
+            $film->removeSpecies($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Character[]
+     */
+    public function getPeople(): Collection
+    {
+        return $this->people;
+    }
+
+    public function addPerson(Character $person): self
+    {
+        if (!$this->people->contains($person)) {
+            $this->people[] = $person;
+            $person->addSpecies($this);
+        }
+
+        return $this;
+    }
+
+    public function removePerson(Character $person): self
+    {
+        if ($this->people->contains($person)) {
+            $this->people->removeElement($person);
+            $person->removeSpecies($this);
+        }
+
+        return $this;
+    }
+
+    public function getHomeworld(): ?Planet
+    {
+        return $this->homeworld;
+    }
+
+    public function setHomeworld(?Planet $homeworld): self
+    {
+        $this->homeworld = $homeworld;
 
         return $this;
     }
